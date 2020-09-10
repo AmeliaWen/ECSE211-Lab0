@@ -1,0 +1,15 @@
+#VRML_SIM R2020a utf8
+# Converted by DPMConverter v1.2 by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Legal Notices: (For parts from Leocad/LDraw)
+# LeoCAD is distributed under the GNU General Public License (GPL) version 2.
+# The Parts Library used by LeoCAD is a copy of LDraw's Library, which is distributed under the LDraw License Agreement and based on the Creative Commons 2 License.
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3-Gyroscope-boundingbox [
+]
+{
+		Box {
+			size 0.023850 0.039352 0.031005
+		}
+}

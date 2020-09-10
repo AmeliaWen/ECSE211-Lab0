@@ -1,0 +1,50 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm NXT Ultrasonic Sensor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO NXT-Ultrasonic [
+  field SFString   name     "sensor"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+  Solid {
+    name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+    translation IS translation
+    rotation IS rotation
+    children [
+      #Shape model of the sensor
+      NXT-Ultrasonic-shape {
+      }
+      Transform{
+        translation 0 -0.02 0.006
+        rotation 0 0 1 -1.5707996938995747
+        children[
+          #Box to check sensor position
+#          SolidBox{
+#           size 0.01 0.01 0.01
+#          }
+          #Simulated sensor
+          DistanceSensor {
+            name IS name
+            lookupTable [
+              0 0 1
+              0.05 5 0.01
+              2.55 255 0.05
+            ]
+            numberOfRays 10
+            aperture 0.4 # ~20 degrees
+          }
+        ]
+      }
+
+    ]
+    boundingObject NXT-Ultrasonic-boundingbox {
+    }
+    physics Physics {
+      density -1
+      mass 0.024
+    }
+  }
+}

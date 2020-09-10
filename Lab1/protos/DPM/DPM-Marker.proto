@@ -1,0 +1,83 @@
+#VRML_SIM R2020a utf8
+# ECSE211 (DPM) marker shape Proto by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Units are meters
+
+PROTO DPM-Marker [
+ field SFVec2f    translation  0 0
+ field SFFloat    rotation      0
+ 
+ field SFFloat    borderWidth     0.01
+ 
+ field SFFloat    r1     0.1
+ field SFFloat    r2     0.2
+ 
+ field SFFloat    sections 5
+
+ field SFColor    ringColor    0.5 0.5 1
+ field SFFloat    ringRoughness 0.8
+ field SFFloat    ringMetalness 0
+
+ field SFColor    borderColor    0 0 0
+ field SFFloat    borderRoughness 0.8
+ field SFFloat    borderMetalness 0
+
+ field SFBool     drawBackFace  FALSE
+]
+{
+  %{
+    local r1 = fields.r1.value
+    local r2 = fields.r2.value
+    local borderWidth = fields.borderWidth.value
+    local dt = 2*math.pi/math.ceil(fields.sections.value)
+    local position = fields.translation.value
+  }%
+  Transform {
+    translation %{=position.x}% 0.0001 %{=position.y}%
+    rotation 0 1 0 %{=fields.rotation.value}%
+    children [
+      %{ for t = 0,2*math.pi-dt+0.1,dt do }% #+0.1 solves an issue with rounding where the last segment is missing with some values
+        #Inside Border, only draw if r1>0
+        %{ if(r1>0) then }%
+          ringSection{
+            r1 IS r1 
+            r2 %{=r1+borderWidth}%
+            t1 %{=t}%
+            t2 %{=t+dt}%
+            color IS borderColor
+            roughness IS borderRoughness
+            metalness IS borderMetalness
+            drawBackFace IS drawBackFace
+          }
+        %{ end }%
+        #Outside Border
+        ringSection{
+          r1 %{=r2-borderWidth}%
+          r2 IS r2
+          t1 %{=t}%
+          t2 %{=t+dt}%
+          color IS borderColor
+          roughness IS borderRoughness
+          metalness IS borderMetalness
+          drawBackFace IS drawBackFace
+        }
+        #Main Part of the ring
+        ringSection{
+          %{ if(r1>0) then }%
+            r1 %{=r1+borderWidth}%
+          %{ else }%
+             r1 IS r1
+          %{ end }%
+          r2 %{=r2-borderWidth}%
+          t1 %{=t}%
+          t2 %{=t+dt}%
+          color IS ringColor
+         roughness IS ringRoughness
+          metalness IS ringMetalness
+          drawBackFace IS drawBackFace
+        }
+      %{ end }%
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm NXT Motor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO BallCaster [
+  field SFString   name     "ballcaster"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+  Transform {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Solid {
+        boundingObject BallCaster-base-boundingbox {
+        }
+        physics Physics {
+        }
+        name "%{= fields.name.value .. '-base' }%"
+        children [
+          BallCaster-base-shape {
+          }
+          Transform {
+            translation 0 0 -0.01
+            children [
+              BallJoint {
+                endPoint Solid {
+                  name IS name
+                  children [
+                    BallCaster-ball-shape {
+                    }
+                  ]
+                  boundingObject Sphere {
+                    radius 0.00954
+                  }
+                  physics Physics {
+                    density -1
+                    mass 0.028
+                  }
+                }
+              }
+            ]
+          }
+        ]    
+      }      
+    ]        
+  }
+}

@@ -1,0 +1,50 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm EV3 Ultrasonic Sensor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3-Ultrasonic [
+  field SFString   name     "sensor"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+  Solid {
+    name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+    translation IS translation
+    rotation IS rotation
+    children [
+      #Shape model of the sensor
+      EV3-Ultrasonic-shape {
+      }
+      Transform{
+        translation 0 -0.02 0.006
+        rotation 0 0 1 -1.5707996938995747
+        children[
+          #Box to check sensor position
+#          SolidBox{
+#           size 0.01 0.01 0.01
+#          }
+          #Simulated sensor
+          DistanceSensor {
+            name IS name
+            lookupTable [
+              0 0 1
+              0.05 5 0.1
+              2.55 255 0.25
+            ]
+            numberOfRays 10
+            aperture 0.2 # ~10 degrees (smaller than the ~20 degrees of the real sensor)
+          }
+        ]
+      }
+
+    ]
+    boundingObject EV3-Ultrasonic-boundingbox {
+    }
+    physics Physics {
+      density -1
+      mass 0.024
+    }
+  }
+}

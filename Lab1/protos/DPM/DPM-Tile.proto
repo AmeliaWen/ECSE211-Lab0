@@ -1,0 +1,187 @@
+#VRML_SIM R2020a utf8
+# ECSE211 (DPM) Tile Proto by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Units are meters
+
+PROTO DPM-Tile [
+ field SFString   name     "tile"  #Individual Name of the tile, will include coordinates in name to simplify supervisor 
+ field SFVec3f    translation  0 0 0
+ field SFFloat    tileSize     0.3048
+ field SFFloat    borderSize   0.005
+ field SFColor    mainColor    0.5 0.5 1
+ field SFColor    edgeColor    0 0 0
+ field SFBool     boundingObject  FALSE     #Determines whether to define a bounding object or not
+ field SFBool     infiniteBoundingObject  FALSE     #Determines whether an infinite or finite bounding object should be defined
+ field SFBool     drawBackFace  FALSE     #Draw back face
+ hiddenField SFFloat    edgeRoughness 0.8
+ hiddenField SFFloat    edgeMetalness 0
+ hiddenField SFFloat    mainRoughness 0.8
+ hiddenField SFFloat    mainMetalness 0
+]
+{
+  %{
+    local s = fields.tileSize.value
+    local b = fields.borderSize.value
+    local planeSize = { x=s , y=s }
+  }%
+
+  Solid {
+    name IS name
+    translation IS translation
+    rotation 0 1 0 0
+    children [
+    
+      #Top Edge
+      Shape {
+       castShadows FALSE
+       appearance PBRAppearance {
+         baseColor IS edgeColor
+         metalness IS edgeMetalness
+         roughness IS edgeRoughness
+        }
+        geometry IndexedFaceSet {
+          coord Coordinate {
+            point [
+              %{=s}% 0 %{=s}%
+              %{=0}% 0 %{=s}%
+              %{=b}% 0 %{=s-b}%
+              %{=s-b}% 0 %{=s-b}%
+            ]
+          }
+          coordIndex [
+            3 2 1 0 -1
+            %{ if(fields.drawBackFace.value) then }%
+            0 1 2 3 -1
+            %{ end }%
+          ]
+        }
+      }
+      
+      #Left Edge
+      Shape {
+       castShadows FALSE
+       appearance PBRAppearance {
+         baseColor IS edgeColor
+         metalness IS edgeMetalness
+         roughness IS edgeRoughness
+        }
+        geometry IndexedFaceSet {
+          coord Coordinate {
+            point [
+              %{=b}% 0 %{=s-b}%
+              %{=0}% 0 %{=s}%
+              %{=0}% 0 %{=0}%
+              %{=b}% 0 %{=b}%
+            ]
+          }
+          coordIndex [
+            3 2 1 0 -1
+            %{ if(fields.drawBackFace.value) then }%
+            0 1 2 3 -1
+            %{ end }%
+          ]
+        }
+      }
+    
+      #Right Edge
+      Shape {
+       castShadows FALSE
+       appearance PBRAppearance {
+         baseColor IS edgeColor
+         metalness IS edgeMetalness
+         roughness IS edgeRoughness
+        }
+        geometry IndexedFaceSet {
+          coord Coordinate {
+            point [
+              %{=s}% 0 %{=s}%
+              %{=s-b}% 0 %{=s-b}%
+              %{=s-b}% 0 %{=b}%
+              %{=s}% 0 %{=0}%
+            ]
+          }
+          coordIndex [
+            3 2 1 0 -1
+            %{ if(fields.drawBackFace.value) then }%
+            0 1 2 3 -1
+            %{ end }%
+          ]
+        }
+      }
+      
+      #Bottom Edge
+      Shape {
+       castShadows FALSE
+       appearance PBRAppearance {
+         baseColor IS edgeColor
+         metalness IS edgeMetalness
+         roughness IS edgeRoughness
+        }
+        geometry IndexedFaceSet {
+          coord Coordinate {
+            point [
+              %{=s-b}% 0 %{=b}%
+              %{=b}% 0 %{=b}%
+              %{=0}% 0 %{=0}%
+              %{=s}% 0 %{=0}%
+            ]
+          }
+          coordIndex [
+            3 2 1 0 -1
+            %{ if(fields.drawBackFace.value) then }%
+            0 1 2 3 -1
+            %{ end }%
+          ]
+        }
+      }
+    
+      #Main Part
+      Shape {
+       castShadows FALSE
+       appearance PBRAppearance {
+         baseColor IS mainColor
+         metalness IS mainMetalness
+         roughness IS mainRoughness
+        }
+        geometry IndexedFaceSet {
+          coord Coordinate {
+            point [
+              %{=s-b}% 0 %{=s-b}%
+              %{=b}% 0 %{=s-b}%
+              %{=b}% 0 %{=b}%
+              %{=s-b}% 0 %{=b}%
+            ]
+          }
+          coordIndex [
+            3 2 1 0 -1
+            %{ if(fields.drawBackFace.value) then }%
+            0 1 2 3 -1
+            %{ end }%
+          ]
+        }
+      }
+    ]
+
+    contactMaterial "DPM-Tile"
+
+    %{ if(fields.boundingObject.value) then }%
+      %{ if(fields.infiniteBoundingObject.value) then }%
+        boundingObject Plane {
+        }
+      %{ else }%
+        boundingObject Transform {
+          translation %{=s/2}% 0 %{=s/2}%
+          children [
+            Plane {
+              size  %{=s}% %{=s}%
+            }
+          ]
+        }
+      %{ end }%
+    %{ end }%
+
+    locked TRUE
+
+  }
+}

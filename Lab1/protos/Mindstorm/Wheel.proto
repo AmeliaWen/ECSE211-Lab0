@@ -1,0 +1,31 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm Wheel by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO Wheel [
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+Solid {
+    translation IS translation
+    rotation IS rotation
+    contactMaterial "Rubber"
+    children [
+      Wheel-shape {
+      }
+    ]
+    boundingObject Cylinder {
+      #height 0.026235
+      #radius 0.021465
+      height 0.015
+      radius 0.021
+      subdivision 64
+    }
+    physics Physics {
+     density -1
+     mass 0.017
+    }
+  }
+}

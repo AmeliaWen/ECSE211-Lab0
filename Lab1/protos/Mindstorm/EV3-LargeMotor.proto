@@ -1,0 +1,73 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm EV3 Large Motor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3-LargeMotor [
+  field SFString   name     "motor"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+  field SFFloat    maximumVelocity     5000 # 6.28
+  field SFFloat    sensorResolution    0.00628
+  field SFFloat    position    0
+  field MFNode     children  []
+]
+{
+  Solid {
+    name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+    translation IS translation
+    rotation IS rotation
+    children [
+      EV3-LargeMotor-Base-shape {
+      }
+      Transform {
+        translation 0 0.0418 -0.016
+        children [
+          HingeJoint {
+            jointParameters HingeJointParameters {
+             position IS position
+             axis -1 0 0
+             #negative 1 to get the motor to spin "forward" in the same direction as the real motor
+            }
+            device [
+              RotationalMotor {
+               name IS name
+               #https://education.lego.com/en-us/products/lego-mindstorms-education-ev3-large-servo-motor/45502
+               #Max velocity is 170 rpm = 17.80235835 rad/s
+               maxVelocity 17.80
+               #Torque is measured in N/cm already
+               maxTorque 40
+               #consumptionFactor = electrical_input_power (watts) / output_torque (N/cm)
+               consumptionFactor 0.4
+              }
+              PositionSensor {
+                name %{= '"' .. fields.name.value .. '-sensor' .. '"' }%
+                resolution IS sensorResolution
+              }
+            ]
+            endPoint Solid {
+              name %{= '"' .. fields.name.value .. '-shaft' .. '"' }%
+              children [
+                EV3-LargeMotor-Shaft-shape {
+                }
+                Group {
+                 children IS children
+                }
+              ]
+              physics Physics {
+              }
+              boundingObject EV3-LargeMotor-Shaft-boundingbox {
+              }
+            }
+          }
+        ]
+      }
+    ]
+    boundingObject EV3-LargeMotor-Base-boundingbox {
+    }
+    physics Physics {
+      density -1
+      mass 0.081
+    }
+  }
+}

@@ -1,0 +1,68 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm EV3 Touch Sensor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3-Touch [
+  field SFString   name     "sensor"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+  field MFNode     children  []
+  field SFFloat    position    0
+]
+{
+  Solid {
+    name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+    translation IS translation
+    rotation IS rotation
+    children [
+      #Shape model of the sensor body
+      EV3-Touch-Base-shape {
+      }
+      Transform {
+        translation 0 -0.017 0.004
+        children [
+          SliderJoint {
+            jointParameters JointParameters {
+              position IS position
+              axis 0 1 0
+              minStop 0
+              maxStop 0.005
+              #Not sure about these value, but behaves well
+              springConstant 500
+	      dampingConstant 0.2
+            }
+            device [
+              PositionSensor {
+                name IS name
+              }
+            ]
+            endPoint Solid {
+              name %{= '"' .. fields.name.value .. '-plunger' .. '"' }%
+              children [
+                EV3-Touch-Button-shape {
+                }
+                Transform {
+                  translation 0 -0.007 0
+                  children IS children
+                }
+              ]
+              boundingObject EV3-Touch-Button-boundingbox {
+              }
+              physics Physics {
+                density -1
+                mass 0.024
+              }
+            }
+          }
+        ]
+      }
+    ]
+    boundingObject EV3-Touch-Base-boundingbox {
+    }
+    physics Physics {
+      density -1
+      mass 0.024
+    }
+  }
+}

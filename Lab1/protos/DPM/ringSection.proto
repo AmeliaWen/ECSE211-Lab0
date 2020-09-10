@@ -1,0 +1,54 @@
+#VRML_SIM R2020a utf8
+# ECSE211 (DPM) Ring Section Proto by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Units are meters
+
+PROTO ringSection [
+ 
+ field SFFloat    r1     0.1
+ field SFFloat    r2     0.2
+ 
+ field SFFloat    t1     0.1
+ field SFFloat    t2     0.2
+ 
+ field SFColor    color    0.5 0.5 1
+ field SFFloat    roughness 0.8
+ field SFFloat    metalness 0
+ 
+ field SFBool     drawBackFace  FALSE
+]
+{
+  %{
+    local r1 = fields.r1.value
+    local r2 = fields.r2.value
+    local t1 = fields.t1.value
+    local t2 = fields.t2.value
+  }%
+  Shape {
+    castShadows FALSE
+    appearance PBRAppearance {
+      baseColor IS color
+      metalness IS metalness
+      roughness IS roughness
+    }
+    geometry IndexedFaceSet {
+      coord Coordinate {
+        point [
+          %{=r1*math.cos(t2)}% 0 %{=r1*math.sin(t2)}%
+          %{=r1*math.cos(t1)}% 0 %{=r1*math.sin(t1)}%
+          %{=r2*math.cos(t1)}% 0 %{=r2*math.sin(t1)}%
+          %{=r2*math.cos(t2)}% 0 %{=r2*math.sin(t2)}%
+        ]
+      }
+      coordIndex [
+        0 2 1 -1
+        0 3 2 -1
+        %{ if(fields.drawBackFace.value) then }%
+        0 1 2 -1
+        0 2 3 -1
+        %{ end }%
+      ]
+    }
+  }
+}

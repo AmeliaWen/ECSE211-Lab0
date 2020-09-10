@@ -1,0 +1,66 @@
+#VRML_SIM R2020a utf8
+# ECSE211 (DPM) marker shape Proto by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Units are meters
+
+PROTO DPM-Obstacle [
+ field SFString   name          "obstacle"  #Individual Name of the bridge, should be unique
+ field SFVec2f    position      0 0     # Tile coordinate of the position
+ field SFFloat    rotation      0       # Rotation arount the y axis only
+ 
+ field SFFloat    radius        0.15   # Size of the obstacle 
+ field SFFloat    height        0.2     # Height of the obstacle
+ field SFFloat    thickness     0.01     # Thickness of the material
+ 
+ field SFFloat    sections      5       # Number of sections for the circular part
+ 
+ field SFFloat    tileSize     0.3048   # Size of a tile, should be set to the same thing as the DPM tile value
+]
+{
+  %{
+    local position = fields.position.value
+    local tileSize = fields.tileSize.value
+    local height = fields.height.value
+    local thickness = fields.thickness.value
+    -- Radius offset by half the thickness of the material
+    local radius = fields.radius.value - thickness / 2
+    
+    local sections = math.ceil(fields.sections.value)
+    -- Delta tetha between sections
+    local dt = 2*math.pi / sections
+    -- Size of each section
+    local sw = math.sqrt( 2*radius*radius*(1-math.cos(dt)))
+    -- Radius of the incircle of a regular polygon, where the boxes will be placed
+    local r = sw/(2*math.tan( math.pi/sections))
+  }%
+  Transform {
+    translation %{=position.x*tileSize}% %{=height/2}% %{=position.y*tileSize}%
+    rotation 0 1 0 %{=fields.rotation.value}%
+    children [
+      %{ for t = 0,2*math.pi,dt do }%
+        SolidBox{
+          name "%{= fields.name.value .. string.format('[%f]',t) }%"
+          translation %{=r*math.cos(t)}% 0 %{=r*math.sin(t)}% 
+          rotation 0 1 0 %{=-t+math.pi/2}%
+          size %{=sw}% %{=fields.height.value}% %{=thickness}%
+          castShadows TRUE
+          enableBoundingObject TRUE
+          appearance PBRAppearance {
+            baseColorMap ImageTexture { url [ "textures/wall_baseColor.png" ] }
+            normalMap ImageTexture { url [ "textures/wall_normal.png" ] }
+            occlusionMap ImageTexture { url [ "textures/wall_occlusion.png" ] }
+            normalMapFactor 0.8
+            occlusionMapStrength 1
+            metalness 0
+            IBLStrength 5
+            roughness 0.5
+            textureTransform TextureTransform {
+              translation %{=t}% %{=t}%
+            }
+          }
+        }
+      %{ end }%
+    ]
+  }
+}

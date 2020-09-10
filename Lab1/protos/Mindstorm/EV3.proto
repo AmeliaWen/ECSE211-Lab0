@@ -1,0 +1,36 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm EV3 Color Sensor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3 [
+  field SFString   name     "EV3"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+  Group {
+    children [
+      #Main body of the EV3
+      Solid {
+        name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+        translation IS translation
+        rotation IS rotation
+        children [
+          EV3-shape {
+          }
+        ]
+        boundingObject EV3-boundingbox {
+        }
+        physics Physics {
+          density -1
+          mass 0.288
+        }
+      }
+      #Embedded speaker
+      Speaker {
+        name "speaker"
+      }
+    ]
+  }  
+}

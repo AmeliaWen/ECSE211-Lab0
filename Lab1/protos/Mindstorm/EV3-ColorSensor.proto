@@ -1,0 +1,57 @@
+#VRML_SIM R2020a utf8
+# LEGO Mindstorm EV3 Color Sensor by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# LEGO(R) is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this file.
+PROTO EV3-ColorSensor [
+  field SFString   name     "colorSensor"
+  field SFVec3f    translation   0 0 0
+  field SFRotation rotation      0 0 1 0
+]
+{
+  Solid {
+    name %{= '"' .. fields.name.value .. '-body' .. '"' }%
+    translation IS translation
+    rotation IS rotation
+    children [
+      Transform {
+        translation 0 -0.02 0
+        children [
+          LED {
+            name %{= '"' .. fields.name.value .. '-light' .. '"' }%
+            gradual FALSE
+            color 1 1 1
+            children [
+              SpotLight {
+                color 1 1 1
+                intensity 1
+                attenuation 0 0 1000
+                beamWidth 1
+                cutOffAngle 1.5
+                direction 0 -1 0
+              }
+            ]
+          }
+        ]
+      }
+      Camera {
+        name IS name
+        translation 0 -0.02 0.007
+        rotation 1 0 0 -1.57
+        fieldOfView 0.2
+        width 1
+        height 1
+        near 1e-06
+        noise 0.01
+      }
+      EV3-Color-shape {
+      }
+    ]
+    boundingObject EV3-Color-boundingbox {
+    }
+    physics Physics {
+      density -1
+      mass 0.014
+    }
+  }
+}

@@ -1,0 +1,79 @@
+#VRML_SIM R2020a utf8
+# ECSE211 (DPM) marker shape Proto by Olivier St-Martin Cormier
+# license: Creative Commons Attribution 4.0 International Public License
+# license url: https://creativecommons.org/licenses/by/4.0/legalcode
+# Units are meters
+
+PROTO DPM-Bridge [
+ field SFString   name          "bridge"  #Individual Name of the bridge, should be unique
+ field SFVec2f    position      0 0     # Tile coordinate of the position
+ field SFFloat    rotation      0       # Rotation arount the y axis only
+ 
+ field SFFloat    r1            0.1475  # Inner radius of the tube
+ field SFFloat    r2            0.16    # Outer radius of the tube
+ field SFFloat    deckwidth     0.213   # Width of the floor at the bottom
+ 
+ field SFFloat    length        0.270   # Length of the tunnel
+ 
+ field SFFloat    sections      5       # Number of sections for the circular part
+ 
+ field SFFloat    tileSize     0.3048   # Size of a tile, should be set to the same thing as the DPM tile value
+]
+{
+  %{
+    local position = fields.position.value
+    local tileSize = fields.tileSize.value
+    
+    local r1 = fields.r1.value
+    local r2 = fields.r2.value
+    -- Difference between the two radii (thickness of the material)
+    local dr = r2-r1
+    local dw = fields.deckwidth.value
+    local l = fields.length.value
+    
+    -- Start angle of the arch
+    local t1 = - math.acos( dw / ( 2 * r1 ) )
+    -- End angle of the arch
+    local t2 = math.pi - t1
+    -- Delta angle
+    local dt = (t2 + t1)/math.ceil(fields.sections.value)
+    -- Width of an "arch" segment
+    local aw = math.sqrt( 2*math.pow(r1+dr/2,2)*(1-math.cos(dt)))
+    -- Make the section width a bit wider to cover the gap (looks better)
+    aw = aw*1.1
+    
+    -- Distance to mve the bridge up so that it's above ground
+    local dy = math.sqrt( r1 * r1 - dw * dw / 4 )
+    
+    
+  }%
+  Transform {
+    translation %{=position.x*tileSize}% %{=dy}% %{=position.y*tileSize}%
+    rotation 0 1 0 %{=fields.rotation.value}%
+    children [
+      %{ for t = t1+dt/2,t2+dt/2,dt do }%
+        SolidBox{
+          name "%{= fields.name.value .. string.format('[%f]',t) }%"
+          translation 0 %{=(r1+dr/2)*math.sin(t)}% %{=(r1+dr/2)*math.cos(t)}%
+          rotation 1 0 0 %{=-t}%
+          size %{=l}% %{=aw}% %{=dr}%
+          castShadows TRUE
+          enableBoundingObject TRUE
+          appearance PBRAppearance {
+            baseColorMap ImageTexture { url [ "textures/wall_baseColor.png" ] }
+            normalMap ImageTexture { url [ "textures/wall_normal.png" ] }
+            normalMapFactor 0.8
+            occlusionMap ImageTexture { url [ "textures/wall_occlusion.png" ] }
+            occlusionMapStrength 1
+            metalness 0
+            IBLStrength 5
+            roughness 1
+            textureTransform TextureTransform {
+              translation %{=t}% %{=t}%
+            }
+          }
+        }
+      %{ end }%
+    ]
+  }
+}
