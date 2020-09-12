@@ -31,6 +31,7 @@ public class Lab1 {
   public static final int INVALID_SAMPLE_LIMIT = 20;
   /** The poll sleep time, in milliseconds. */
   public static final int POLL_SLEEP_TIME = 50;
+  
 
   // Hardware resources
 
@@ -111,11 +112,35 @@ public class Lab1 {
   public static void controller(int distance, int[] motorSpeeds) {
     int leftSpeed = MOTOR_HIGH;
     int rightSpeed = MOTOR_HIGH;
-    
+    int distError = 0;
+    // TODO Calculate the correct motor speeds and assign them to motorSpeeds like this
     // TODO Calculate the correct motor speeds and assign them to motorSpeeds like this
     
-    motorSpeeds[LEFT] = leftSpeed;
-    motorSpeeds[RIGHT] = rightSpeed;
+    if (distance<250) {
+      distError= WALL_DIST+7-distance;
+      System.out.println(distError);
+      if(Math.abs(distError)<=WALL_DIST_ERR_THRESH-2) {
+        motorSpeeds[LEFT] = leftSpeed;
+        motorSpeeds[RIGHT] = rightSpeed;
+      }else if (distError >5){
+      motorSpeeds[RIGHT] = leftSpeed+250;
+        motorSpeeds[LEFT] = 0;
+      }
+      else if (distError>0&& distError<=5 ) {
+        motorSpeeds[RIGHT] = leftSpeed+200;
+        motorSpeeds[LEFT] = MOTOR_LOW;
+      }else if (distError <0){
+        motorSpeeds[LEFT] = leftSpeed+200;
+        motorSpeeds[RIGHT] = MOTOR_LOW;
+        }
+    }
+    try {
+      Thread.sleep(POLL_SLEEP_TIME);
+    }catch(InterruptedException e) {
+      e.printStackTrace();
+    }
+    
+   
   }
   
   /** Returns the filtered distance between the US sensor and an obstacle in cm. */
